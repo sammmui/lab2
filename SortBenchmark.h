@@ -7,3 +7,5 @@ private:
     std::vector<int> data;
 
 public:
+ SortBenchmark();
+ void runAllTests();
