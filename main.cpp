@@ -1,7 +1,14 @@
 #include "analyzer.h"
+#include <iostream>
 
 int main() {
-    analyzer a;
-    a.run_tests();
+    try {
+        analyzer a;
+        a.run_tests();
+    } catch (const std::exception& e) {
+        std::cerr << "Сталася помилка: " << e.what() << std::endl;
+        return 1;
+    }
+
     return 0;
 }
