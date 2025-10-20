@@ -7,3 +7,7 @@ std::vector<int> analyzer::generate_data(size_t n) {
      std::uniform_int_distribution<int> dist(0, 1000);
     for (auto& x : v) x = dist(gen);
     return v;
+ }
+ bool analyzer::predicate(int x) {
+      return x <= 900;
+}
