@@ -1,21 +1,23 @@
 #include "analyzer.h"
 
 analyzer::analyzer() {}
+
 std::vector<int> analyzer::generate_data(size_t n) {
     std::vector<int> v(n);
-      std::mt19937 gen(std::random_device{}());
-     std::uniform_int_distribution<int> dist(0, 1000);
+    std::mt19937 gen(std::random_device{}());
+    std::uniform_int_distribution<int> dist(0, 1000);
     for (auto& x : v) x = dist(gen);
     return v;
- }
- bool analyzer::predicate(int x) {
-      return x <= 900;
+}
+
+bool analyzer::predicate(int x) {
+    return x <= 900;
 }
 
 void analyzer::test_library_algorithms(const std::vector<int>& data) {
     std::cout << "\n=== library algorithms all_of ===\n";
     std::cout << std::setw(25) << "policy" << std::setw(15) << "time(second)" << "\n";
-      double t1 = measure_time([&]() {
+    double t1 = measure_time([&]() {
         std::all_of(data.begin(), data.end(), [&](int x) { return predicate(x); });
     });
     std::cout << std::setw(25) << "without policy" << std::setw(15) << t1 << "\n";
@@ -62,6 +64,7 @@ bool analyzer::custom_parallel_all_of(const std::vector<int>& data) {
     for (auto& t : workers) t.join();
     return result;
 }
+
 void analyzer::test_parallel_algorithm(const std::vector<int>& data) {
     std::cout << "\n=== own parallel all_of ===\n";
     size_t threads = std::thread::hardware_concurrency();
@@ -73,7 +76,7 @@ void analyzer::test_parallel_algorithm(const std::vector<int>& data) {
         custom_parallel_all_of(data);
     });
 
-    std::cout << std::setw(25) << "own implentation" << std::setw(15) << t << "\n";
+    std::cout << std::setw(25) << "own implementation" << std::setw(15) << t << "\n";
 }
 
 void analyzer::run_tests() {
