@@ -44,3 +44,9 @@ void analyzer::test_library_algorithms(const std::vector<int>& data) {
     });
     std::cout << std::setw(25) << "par_unseq" << std::setw(15) << t4 << "\n";
 }
+
+bool analyzer::custom_parallel_all_of(const std::vector<int>& data, size_t threads) {
+    size_t n = data.size();
+    size_t chunk = n / threads;
+    std::vector<std::thread> workers;
+    std::atomic<bool> result(true);
