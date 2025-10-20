@@ -11,3 +11,13 @@ std::vector<int> analyzer::generate_data(size_t n) {
  bool analyzer::predicate(int x) {
       return x <= 900;
 }
+
+
+template<typename Func>
+double analyzer::measure_time(Func f) {
+    auto start = std::chrono::high_resolution_clock::now();
+    f();
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> diff = end - start;
+    return diff.count();
+}
