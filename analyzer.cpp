@@ -16,40 +16,57 @@ bool analyzer::predicate(int x) {
 
 void analyzer::test_library_algorithms(const std::vector<int>& data) {
     std::cout << "\n=== library algorithms all_of ===\n";
-    std::cout << std::setw(25) << "policy" << std::setw(15) << "time(second)" << "\n";
+    std::cout << "Data size: " << data.size() << "\n";
+    std::cout << std::setw(25) << "policy" 
+              << std::setw(20) << "time (s)" 
+              << std::setw(10) << "result" << "\n";
+    std::cout << std::string(60, '-') << "\n";
+
+    bool r1, r2, r3, r4;
+
     double t1 = measure_time([&]() {
-        std::all_of(data.begin(), data.end(), [&](int x) { return predicate(x); });
+        r1 = std::all_of(data.begin(), data.end(), [&](int x) { return predicate(x); });
     });
-    std::cout << std::setw(25) << "without policy" << std::setw(15) << t1 << "\n";
+    std::cout << std::setw(25) << "no policy (std::all_of)" 
+              << std::setw(20) << t1 
+              << std::setw(10) << (r1 ? "true" : "false") << "\n";
 
     double t2 = measure_time([&]() {
-        std::all_of(std::execution::seq, data.begin(), data.end(), [&](int x) { return predicate(x); });
+        r2 = std::all_of(std::execution::seq, data.begin(), data.end(), [&](int x) { return predicate(x); });
     });
-    std::cout << std::setw(25) << "seq" << std::setw(15) << t2 << "\n";
+    std::cout << std::setw(25) << "seq" 
+              << std::setw(20) << t2 
+              << std::setw(10) << (r2 ? "true" : "false") << "\n";
 
     double t3 = measure_time([&]() {
-        std::all_of(std::execution::par, data.begin(), data.end(), [&](int x) { return predicate(x); });
+        r3 = std::all_of(std::execution::par, data.begin(), data.end(), [&](int x) { return predicate(x); });
     });
-    std::cout << std::setw(25) << "par" << std::setw(15) << t3 << "\n";
+    std::cout << std::setw(25) << "par" 
+              << std::setw(20) << t3 
+              << std::setw(10) << (r3 ? "true" : "false") << "\n";
 
     double t4 = measure_time([&]() {
-        std::all_of(std::execution::par_unseq, data.begin(), data.end(), [&](int x) { return predicate(x); });
+        r4 = std::all_of(std::execution::par_unseq, data.begin(), data.end(), [&](int x) { return predicate(x); });
     });
-    std::cout << std::setw(25) << "par_unseq" << std::setw(15) << t4 << "\n";
+    std::cout << std::setw(25) << "par_unseq" 
+              << std::setw(20) << t4 
+              << std::setw(10) << (r4 ? "true" : "false") << "\n";
 }
 
-bool analyzer::custom_parallel_all_of(const std::vector<int>& data) {
+bool analyzer::custom_parallel_all_of(const std::vector<int>& data, size_t threads) {
     size_t n = data.size();
-    size_t threads = std::thread::hardware_concurrency();
-    if (threads == 0) threads = 2;
+    if (n == 0) return true;
+    if (threads == 0) threads = 1;
 
-    size_t chunk = n / threads;
+    size_t actual_threads = std::min(threads, n);
+    size_t chunk = n / actual_threads;
+
     std::vector<std::thread> workers;
     std::atomic<bool> result(true);
 
-    for (size_t i = 0; i < threads; ++i) {
+    for (size_t i = 0; i < actual_threads; ++i) {
         size_t start = i * chunk;
-        size_t end = (i == threads - 1) ? n : start + chunk;
+        size_t end = (i == actual_threads - 1) ? n : start + chunk;
 
         workers.emplace_back([&, start, end]() {
             for (size_t j = start; j < end && result; ++j) {
@@ -67,20 +84,27 @@ bool analyzer::custom_parallel_all_of(const std::vector<int>& data) {
 
 void analyzer::test_parallel_algorithm(const std::vector<int>& data) {
     std::cout << "\n=== own parallel all_of ===\n";
-    size_t threads = std::thread::hardware_concurrency();
-    if (threads == 0) threads = 2;
+    size_t max_threads = std::thread::hardware_concurrency();
+    if (max_threads == 0) max_threads = 2;
 
-    std::cout << "number of threads: " << threads << "\n";
+    std::cout << std::setw(25) << "threads" 
+              << std::setw(20) << "time (s)" 
+              << std::setw(10) << "result" << "\n";
+    std::cout << std::string(60, '-') << "\n";
 
-    double t = measure_time([&]() {
-        custom_parallel_all_of(data);
-    });
-
-    std::cout << std::setw(25) << "own implementation" << std::setw(15) << t << "\n";
+    for (size_t k = 1; k <= max_threads * 2; k *= 2) {
+        bool res = true;
+        double t = measure_time([&]() {
+            res = custom_parallel_all_of(data, k);
+        });
+        std::cout << std::setw(25) << k 
+                  << std::setw(20) << t 
+                  << std::setw(10) << (res ? "true" : "false") << "\n";
+    }
 }
 
 void analyzer::run_tests() {
-    std::vector<size_t> sizes = {100000, 1000000, 10000000};
+    std::vector<size_t> sizes = {100000, 1000000, 5000000};
 
     for (auto n : sizes) {
         std::cout << "\n==============================\n";
