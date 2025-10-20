@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
-
+#include <random>
+#include <iostream>
+#include <iomanip>
 
 class analyzer {
 public:
