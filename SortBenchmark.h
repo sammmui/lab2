@@ -7,5 +7,7 @@ private:
     std::vector<int> data;
 
 public:
- SortBenchmark();
+ SortBenchmark(size_t n);
  void runAllTests();
+ static std::vector<int> generateData(size_t n);
+    static long long measureTime
