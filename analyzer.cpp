@@ -45,8 +45,55 @@ void analyzer::test_library_algorithms(const std::vector<int>& data) {
     std::cout << std::setw(25) << "par_unseq" << std::setw(15) << t4 << "\n";
 }
 
-bool analyzer::custom_parallel_all_of(const std::vector<int>& data, size_t threads) {
+bool analyzer::custom_parallel_all_of(const std::vector<int>& data) {
     size_t n = data.size();
+    size_t threads = std::thread::hardware_concurrency();
+    if (threads == 0) threads = 2;
+
     size_t chunk = n / threads;
     std::vector<std::thread> workers;
     std::atomic<bool> result(true);
+
+    for (size_t i = 0; i < threads; ++i) {
+        size_t start = i * chunk;
+        size_t end = (i == threads - 1) ? n : start + chunk;
+
+        workers.emplace_back([&, start, end]() {
+            for (size_t j = start; j < end && result; ++j) {
+                if (!predicate(data[j])) {
+                    result = false;
+                    return;
+                }
+            }
+        });
+    }
+
+    for (auto& t : workers) t.join();
+    return result;
+}
+void analyzer::test_parallel_algorithm(const std::vector<int>& data) {
+    std::cout << "\n=== own parallel all_of ===\n";
+    size_t threads = std::thread::hardware_concurrency();
+    if (threads == 0) threads = 2;
+
+    std::cout << "number of threads: " << threads << "\n";
+
+    double t = measure_time([&]() {
+        custom_parallel_all_of(data);
+    });
+
+    std::cout << std::setw(25) << "own implentation" << std::setw(15) << t << "\n";
+}
+
+void analyzer::run_tests() {
+    std::vector<size_t> sizes = {100000, 1000000, 10000000};
+
+    for (auto n : sizes) {
+        std::cout << "\n==============================\n";
+        std::cout << "sample size: " << n << "\n";
+        auto data = generate_data(n);
+
+        test_library_algorithms(data);
+        test_parallel_algorithm(data);
+    }
+}
