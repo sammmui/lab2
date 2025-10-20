@@ -3,6 +3,9 @@
 #include <random>
 #include <iostream>
 #include <iomanip>
+#include <thread>
+#include <chrono>
+#include <execution>
 
 class analyzer {
 public:
