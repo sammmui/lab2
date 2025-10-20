@@ -1,0 +1,13 @@
+# Лабораторна робота №2 
+
+    #Виконала студентка групи К-25 Балєєва Марія (sammmui git.hub)
+
+#Структура проєкту
+├── analyzer.h 
+├── analyzer.cpp 
+├── main.cpp 
+
+#Компіляція:
+/*g++ -std=c++20 -O2 -pthread main.cpp analyzer.cpp -o prog
+ .\prog*/
+ 
