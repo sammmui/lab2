@@ -23,4 +23,24 @@ double analyzer::measure_time(Func f) {
 }
 void analyzer::test_library_algorithms(const std::vector<int>& data) {
     std::cout << "\n=== library algorithms all_of ===\n";
-    std::cout << std::setw(25) << "policy" << std::setw(15) << "yime(second)" << "\n";
+    std::cout << std::setw(25) << "policy" << std::setw(15) << "time(second)" << "\n";
+      double t1 = measure_time([&]() {
+        std::all_of(data.begin(), data.end(), [&](int x) { return predicate(x); });
+    });
+    std::cout << std::setw(25) << "without policy" << std::setw(15) << t1 << "\n";
+
+    double t2 = measure_time([&]() {
+        std::all_of(std::execution::seq, data.begin(), data.end(), [&](int x) { return predicate(x); });
+    });
+    std::cout << std::setw(25) << "seq" << std::setw(15) << t2 << "\n";
+
+    double t3 = measure_time([&]() {
+        std::all_of(std::execution::par, data.begin(), data.end(), [&](int x) { return predicate(x); });
+    });
+    std::cout << std::setw(25) << "par" << std::setw(15) << t3 << "\n";
+
+    double t4 = measure_time([&]() {
+        std::all_of(std::execution::par_unseq, data.begin(), data.end(), [&](int x) { return predicate(x); });
+    });
+    std::cout << std::setw(25) << "par_unseq" << std::setw(15) << t4 << "\n";
+}
