@@ -1,5 +1,9 @@
 # Лабораторна робота №2 
 
+Тема: Дослідження швидкодії бібліотечного алгоритму `std::all_of`  
+Мова програмування: C++20  
+Компілятор: g++ (MinGW/MSYS2), запуск у режимі **Release**
+
     #Виконала студентка групи К-25 Балєєва Марія (sammmui git.hub)
 
 #Структура проєкту
@@ -8,6 +12,6 @@
 ├── main.cpp 
 
 #Компіляція:
-/*g++ -std=c++20 -O2 -pthread main.cpp analyzer.cpp -o prog
- .\prog*/
+g++ -std=c++20 -O2 -pthread main.cpp analyzer.cpp -o prog
+ .\prog
  
