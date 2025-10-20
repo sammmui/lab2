@@ -21,3 +21,6 @@ double analyzer::measure_time(Func f) {
     std::chrono::duration<double> diff = end - start;
     return diff.count();
 }
+void analyzer::test_library_algorithms(const std::vector<int>& data) {
+    std::cout << "\n=== library algorithms all_of ===\n";
+    std::cout << std::setw(25) << "policy" << std::setw(15) << "yime(second)" << "\n";
